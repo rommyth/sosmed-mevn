@@ -9,6 +9,14 @@
     height: calc(100vh - 70px);
     overflow-y: auto;
 
+    @include mobile {
+      display: none;
+    }
+
+    @include tablet {
+      display: none;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }

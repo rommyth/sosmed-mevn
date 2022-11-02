@@ -15,12 +15,17 @@ import LeftBar from './components/leftBar/LeftBar';
 import RightBar from './components/rightBar/RightBar';
 
 import './style.scss';
+
+// react-redux
+import { useSelector } from 'react-redux';
+
 function App() {
-  const currentUser = true;
+  const currentUser = useSelector((state) => state.auth.user);
+  const isDarkMode = useSelector((state) => state.theme.darkMode);
 
   const Layout = () => {
     return (
-      <div className="theme-dark">
+      <div className={`theme-${isDarkMode ? 'dark' : 'light'}`}>
         <Navbar />
         <div style={{ display: 'flex' }}>
           <LeftBar />
@@ -54,7 +59,7 @@ function App() {
           element: <Home />,
         },
         {
-          path: '/profile:id',
+          path: '/profile/:id',
           element: <Profile />,
         },
       ],

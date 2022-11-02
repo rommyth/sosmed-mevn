@@ -12,7 +12,14 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 
+// react-redux
+import { useDispatch, useSelector } from 'react-redux';
+import { appTheme } from '../../features/theme/themeSlice';
+
 export default function Navbar() {
+  const dispatch = useDispatch();
+  const isDarkMode = useSelector((state) => state.theme.darkMode);
+  const user = useSelector((state) => state.auth.user);
   return (
     <div className="navbar">
       <div className="left">
@@ -20,7 +27,16 @@ export default function Navbar() {
           <span>khasocial</span>
         </Link>
         <HomeOutlinedIcon />
-        <DarkModeOutlinedIcon />
+        {isDarkMode ? (
+          <WbSunnyOutlinedIcon
+            onClick={() => dispatch(appTheme.setThemeDark())}
+          />
+        ) : (
+          <DarkModeOutlinedIcon
+            onClick={() => dispatch(appTheme.setThemeDark())}
+          />
+        )}
+
         <GridViewOutlinedIcon />
         <div className="search">
           <SearchOutlinedIcon />
@@ -32,11 +48,8 @@ export default function Navbar() {
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
         <div className="user">
-          <img
-            src="https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600"
-            alt=""
-          />
-          <span>Jhon Doe</span>
+          <img src={user.profilPict} alt="" />
+          <span>{user.name}</span>
         </div>
       </div>
     </div>

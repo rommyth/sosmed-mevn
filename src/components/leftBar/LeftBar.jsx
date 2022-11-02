@@ -13,18 +13,17 @@ import Messages from '../../assets/10.png';
 import Tutorials from '../../assets/11.png';
 import Courses from '../../assets/12.png';
 import Fund from '../../assets/13.png';
+import { useSelector } from 'react-redux';
 
 export default function LeftBar() {
+  const user = useSelector((state) => state.auth.user);
   return (
     <div className="leftBar">
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img
-              src="https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600"
-              alt=""
-            />
-            <span>Jhon Doe</span>
+            <img src={user.profilPict} alt="" />
+            <span>{user.name}</span>
           </div>
           <div className="item">
             <img src={Friends} alt="" />

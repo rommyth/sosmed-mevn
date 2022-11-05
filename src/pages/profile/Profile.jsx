@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './profile.scss';
+import { useParams } from 'react-router-dom';
+
 import FacebookTwoToneIcon from '@mui/icons-material/FacebookTwoTone';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -12,63 +14,111 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Posts from '../../components/posts/Posts';
 
+// redux
+import { useGetUserQuery } from '../../features/profile/userApi';
+import {
+  useGetRelationshipsQuery,
+  useAddRelationshipMutation,
+  useDeleteRelationshipMutation,
+} from '../../features/profile/relationshipsApi';
+import { useSelector } from 'react-redux';
+import Update from '../../components/update/Update';
+
 export default function Profile() {
+  const [openUpdate, setOpenUpdate] = useState(false);
+
+  const { id } = useParams();
+  const currentUser = useSelector((state) => state.auth.user);
+  const { isLoading, error, data: user } = useGetUserQuery(id);
+  const { isLoading: loadRelations, data: relationship } =
+    useGetRelationshipsQuery(id);
+
+  const [addRelationship] = useAddRelationshipMutation();
+  const [deleteRelationship] = useDeleteRelationshipMutation();
+  // General Function ---
+  const handleFollow = (e) => {
+    e.preventDefault();
+
+    if (!relationship.includes(currentUser.id)) {
+      addRelationship({ userId: id });
+    } else {
+      deleteRelationship(id);
+    }
+  };
+
   return (
-    <div className="profile">
-      <div className="images">
-        <img
-          src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          alt=""
-          className="cover"
-        />
-        <img
-          src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
-          alt=""
-          className="profilePic"
-        />
-      </div>
-      <div className="profileContainer">
-        <div className="userInfo">
-          <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <InstagramIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <TwitterIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <LinkedInIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <PinterestIcon fontSize="large" />
-            </a>
+    <>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="profile">
+          <div className="images">
+            <img src={'/upload/' + user.coverPic} alt="" className="cover" />
+            <img
+              src={'/upload/' + user.profilePic}
+              alt=""
+              className="profilePic"
+            />
           </div>
-          <div className="center">
-            <span>Jane Doe</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>USA</span>
+          <div className="profileContainer">
+            <div className="userInfo">
+              <div className="left">
+                <a href="http://facebook.com">
+                  <FacebookTwoToneIcon fontSize="large" />
+                </a>
+                <a href="http://facebook.com">
+                  <InstagramIcon fontSize="large" />
+                </a>
+                <a href="http://facebook.com">
+                  <TwitterIcon fontSize="large" />
+                </a>
+                <a href="http://facebook.com">
+                  <LinkedInIcon fontSize="large" />
+                </a>
+                <a href="http://facebook.com">
+                  <PinterestIcon fontSize="large" />
+                </a>
               </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>kha.dev</span>
+              <div className="center">
+                <span>{user.name}</span>
+                <div className="info">
+                  <div className="item">
+                    <PlaceIcon />
+                    <span>{user.city}</span>
+                  </div>
+                  <div className="item">
+                    <LanguageIcon />
+                    <span>{user.website}</span>
+                  </div>
+                </div>
+                {user.id === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>Update</button>
+                ) : (
+                  <>
+                    {loadRelations ? (
+                      <button disabled>Loading...</button>
+                    ) : (
+                      <button onClick={handleFollow}>
+                        {relationship?.includes(currentUser.id)
+                          ? 'Following'
+                          : 'Follow'}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="right">
+                <EmailOutlinedIcon />
+                <MoreVertIcon />
               </div>
             </div>
-            <button>follow</button>
           </div>
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
+          <div style={{ padding: '0px 20px' }}>
+            <Posts userId={id} />
           </div>
         </div>
-      </div>
-      <div style={{ padding: '0px 20px' }}>
-        <Posts />
-      </div>
-    </div>
+      )}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={user} />}
+    </>
   );
 }

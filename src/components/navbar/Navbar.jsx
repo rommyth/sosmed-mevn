@@ -48,7 +48,7 @@ export default function Navbar() {
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
         <div className="user">
-          <img src={user.profilPict} alt="" />
+          <img src={user.profilePic} alt="" />
           <span>{user.name}</span>
         </div>
       </div>

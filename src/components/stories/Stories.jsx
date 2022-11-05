@@ -9,7 +9,7 @@ export default function Stories() {
   return (
     <div className="stories">
       <div className="story">
-        <img src={user.profilPict} alt="" />
+        <img src={user.profilePic} alt="" />
         <span>{user.name}</span>
         <button>+</button>
       </div>

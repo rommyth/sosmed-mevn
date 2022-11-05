@@ -22,7 +22,7 @@ export default function LeftBar() {
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img src={user.profilPict} alt="" />
+            <img src={user.profilePic} alt="" />
             <span>{user.name}</span>
           </div>
           <div className="item">

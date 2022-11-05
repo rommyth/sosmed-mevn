@@ -1,24 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../features/auth/authSlice';
+
+import axios from 'axios';
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = () => {
-    dispatch(
-      authActions.login({
-        id: 1,
-        name: 'Rommy T',
-        email: 'rommy.taufik@example.com',
-        profilPict:
-          'https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg?auto=compress&cs=tinysrgb&w=1600',
-      })
-    );
-    navigate('/');
+  const { loginRequest, loginSuccess, loginFail } = authActions;
+  const { loading, user, error } = useSelector((state) => state.auth);
+
+  const [inputs, setInputs] = useState({
+    username: '',
+    password: '',
+  });
+
+  const handleInput = (e) => {
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(loginRequest());
+    try {
+      const res = await axios.post(
+        'http://localhost:8800/api/auth/login',
+        inputs,
+        { withCredentials: true }
+      );
+      console.log(res);
+      dispatch(loginSuccess(res.data));
+      navigate('/');
+    } catch (err) {
+      dispatch(loginFail(err.response.data));
+      console.log('err : ', err);
+    }
   };
   return (
     <div className="login">
@@ -38,9 +57,22 @@ export default function Login() {
         <div className="right">
           <h1>Login</h1>
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" />
-            <input type="password" placeholder="Password" />
-            <button type="submit">Login</button>
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              onChange={handleInput}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              onChange={handleInput}
+            />
+            {error && <div style={{ color: 'red' }}>{error}</div>}
+            <button type="submit" disabled={loading ? true : false}>
+              {loading ? 'Loading...' : 'Login'}
+            </button>
           </form>
         </div>
       </div>

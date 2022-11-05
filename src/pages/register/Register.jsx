@@ -1,8 +1,35 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './register.scss';
+import axios from 'axios';
 
 export default function Register() {
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [inputs, setInputs] = useState({
+    username: '',
+    name: '',
+    email: '',
+    password: '',
+  });
+
+  const handleInput = (e) => {
+    setInputs((input) => ({
+      ...input,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8800/api/auth/register', inputs);
+      navigate('/login');
+    } catch (err) {
+      setError(err.response.data);
+    }
+  };
   return (
     <div className="register">
       <div className="card">
@@ -20,12 +47,33 @@ export default function Register() {
         </div>
         <div className="right">
           <h1>Register</h1>
-          <form>
-            <input type="text" placeholder="Username" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-            <input type="text" placeholder="Name" />
-            <button>Register</button>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              onChange={(e) => handleInput(e)}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              onChange={(e) => handleInput(e)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              onChange={(e) => handleInput(e)}
+            />
+            <input
+              type="text"
+              placeholder="Name"
+              name="name"
+              onChange={(e) => handleInput(e)}
+            />
+            {error && <div style={{ color: 'red' }}>{error}</div>}
+            <button type="submit">Register</button>
           </form>
         </div>
       </div>
